@@ -1,6 +1,6 @@
 version: '3'
 services:
-  nginx:
+  nginx-web:
     image: nginx
     labels:
         com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: "true"
@@ -31,6 +31,10 @@ services:
       - ${NGINX_FILES_PATH}/htpasswd:/etc/nginx/htpasswd
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - ./nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl:ro
+    logging:
+      options:
+        max-size: ${NGINX_GEN_LOG_MAX_SIZE:-2m}
+        max-file: ${NGINX_GEN_LOG_MAX_FILE:-10}
 
   nginx-letsencrypt:
     image: jrcs/letsencrypt-nginx-proxy-companion
@@ -45,10 +49,14 @@ services:
       - ${NGINX_FILES_PATH}/htpasswd:/etc/nginx/htpasswd
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
-      NGINX_DOCKER_GEN_CONTAINER: ${DOCKER_GEN}
-      NGINX_PROXY_CONTAINER: ${NGINX_WEB}
+      NGINX_DOCKER_GEN_CONTAINER: ${DOCKER_GEN:-nginx-gen}
+      NGINX_PROXY_CONTAINER: ${NGINX_WEB:-nginx-web}
+    logging:
+      options:
+        max-size: ${NGINX_LETSENCRYPT_LOG_MAX_SIZE:-2m}
+        max-file: ${NGINX_LETSENCRYPT_LOG_MAX_FILE:-10}
 
 networks:
   default:
     external:
-      name: ${NETWORK}
+      name: ${NETWORK:-webproxy}
