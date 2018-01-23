@@ -20,6 +20,6 @@ docker network create $NETWORK
 curl https://raw.githubusercontent.com/jwilder/nginx-proxy/master/nginx.tmpl > nginx.tmpl
 
 # 4. Start proxy
-docker-compose up -d
+docker-compose up -d 
 
 exit 0
